@@ -1,1 +1,1 @@
-feat(server): created the server and a health check endpoint
+feat(test): created a test for the server endpoint
