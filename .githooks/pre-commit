@@ -4,6 +4,9 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
+echo "🔧 Auto-fixing formatting..."
+cargo fmt --all
+
 echo "🔍 Checking formatting..."
 if ! cargo fmt --all -- --check; then
   echo "${RED}❌ Formatting check failed. Run 'cargo fmt --all' to fix it.${NC}"

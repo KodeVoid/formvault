@@ -1,1 +1,1 @@
-style:ran cargo fmt --all
+feat(users): Setup initial customer and staff models

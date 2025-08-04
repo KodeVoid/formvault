@@ -1,4 +1,4 @@
-mod form_entry;
+pub(crate) mod form_entry;
 mod newsletter;
 mod submissions;
-mod traits;
+pub(crate) mod traits;
