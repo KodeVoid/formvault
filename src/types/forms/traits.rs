@@ -1,6 +1,4 @@
-
-pub trait Form 
-{
+pub trait Form {
     fn form_type(&self) -> FormType;
 }
 
