@@ -1,0 +1,25 @@
+#!/bin/sh
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+echo "🔍 Checking formatting..."
+if ! cargo fmt --all -- --check; then
+  echo "${RED}❌ Formatting check failed. Run 'cargo fmt --all' to fix it.${NC}"
+  exit 1
+fi
+
+echo "🧹 Linting with Clippy..."
+if ! cargo clippy --all-targets -- -D warnings; then
+  echo "${RED}❌ Clippy reported warnings or errors. Fix them before committing.${NC}"
+  exit 1
+fi
+
+echo "🧪 Running tests..."
+if ! cargo test; then
+  echo "${RED}❌ Tests failed. Fix them before committing.${NC}"
+  exit 1
+fi
+
+echo "${GREEN}✅ All pre-commit checks passed.${NC}"
