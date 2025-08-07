@@ -1,14 +1,14 @@
-# #!/bin/sh
+#!/bin/sh
 
-# # Simple conventional commit regex
-# pattern='^(feat|fix|docs|style|refactor|perf|test|chore)(\([a-z0-9_\-]+\))?: .+'
+# Simple conventional commit regex
+pattern='^(feat|fix|docs|style|refactor|perf|test|chore)(\([a-z0-9_\-]+\))?: .+'
 
-# msg=$(cat "$1")
+msg=$(cat "$1")
 
-# if ! echo "$msg" | grep -qE "$pattern"; then
-#   echo "❌ Invalid commit message format!"
-#   echo "💡 Example: feat(parser): support new syntax"
-#   exit 1
-# fi
+if ! echo "$msg" | grep -qE "$pattern"; then
+  echo "❌ Invalid commit message format!"
+  echo "💡 Example: feat(parser): support new syntax"
+  exit 1
+fi
 
-# echo "✅ Commit message format OK"
+echo "✅ Commit message format OK"
