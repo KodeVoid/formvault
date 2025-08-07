@@ -1,4 +1,4 @@
-use formvault::server::{run, connect_db};
+use formvault::server::{connect_db, run};
 use std::net::TcpListener;
 
 async fn spawn_app() -> String {

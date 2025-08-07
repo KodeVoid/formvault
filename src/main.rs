@@ -1,5 +1,5 @@
+use formvault::server::{connect_db, run};
 use std::net::TcpListener;
-use formvault::server::{run, connect_db};
 
 #[tokio::main]
 async fn main() {

@@ -1,8 +1,10 @@
-use serde::Serialize;
-use uuid::Uuid;
 use chrono::{DateTime, Utc};
-use sqlx::postgres::PgPoolOptions;
-// Domain trait and struct (your business logic layer)
+use serde::Serialize;
+use sqlx::{postgres::PgPoolOptions, PgPool};
+use uuid::Uuid;
+use anyhow::Result;
+use time::OffsetDateTime;
+
 pub trait Identifiable {
     fn id(&self) -> Uuid;
     fn email(&self) -> &str;
@@ -19,14 +21,12 @@ impl Identifiable for User {
     fn id(&self) -> Uuid {
         self.id
     }
-    
+
     fn email(&self) -> &str {
         &self.email
     }
 }
 
-
-// For new users (when you don't have an ID yet)
 impl User {
     pub fn new(email: String) -> Self {
         Self {
@@ -35,7 +35,23 @@ impl User {
             created_at: Utc::now(),
         }
     }
-    
 }
 
-// Sql
+pub async fn create_user(pool: &PgPool, user: User) -> Result<User> {
+    // Convert chrono::DateTime<Utc> to time::OffsetDateTime
+    let created_at_odt = OffsetDateTime::from_unix_timestamp(user.created_at.timestamp())
+        .unwrap()
+        .replace_nanosecond(user.created_at.timestamp_subsec_nanos())
+        .unwrap();
+
+    sqlx::query!(
+        "INSERT INTO users (id, email, created_at) VALUES ($1, $2, $3)",
+        user.id,
+        user.email,
+        created_at_odt
+    )
+    .execute(pool)
+    .await?;
+
+    Ok(user)
+}
