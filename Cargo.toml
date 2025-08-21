@@ -23,7 +23,7 @@ uuid = { version = "1.17.0", features = ["v4", "serde"] }
 dotenvy = "0.15"
 anyhow = "1.0.98"
 time = "0.3.41"
-diesel = { version = "2.2.0", features = ["postgres"] }
+sqlx = { version = "0.8.6", features = ["postgres", "uuid", "chrono"] }
 # build libpq and openssl as part of the build process
 # uncomment these lines if you run into setup issues
 # pq-sys = { version = "0.6", features = ["bundled"] }
