@@ -1,15 +1,15 @@
 use actix_web::{App, HttpServer};
-use sqlx::SqlitePool;
+use sqlx::PgPool;
 use std::net::TcpListener;
 use crate::routes;
 pub struct FormVault {
-    database_pool: SqlitePool,
+    database_pool: PgPool,
     listener: TcpListener,
 
 }
 
 impl FormVault {
-    pub fn new(pool: SqlitePool, listener: TcpListener) -> Self {
+    pub fn new(pool: PgPool, listener: TcpListener) -> Self {
         Self { database_pool: pool, listener }
     }
 
