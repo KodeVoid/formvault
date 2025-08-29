@@ -1,10 +1,10 @@
+mod errors;
 mod handlers;
 mod models;
-mod routes;
 mod repositories;
+mod routes;
 mod webhook;
-mod errors;
 #[tokio::main]
 async fn main() {
-	let _ = formvault::run().await;
+    let _ = formvault::run().await;
 }

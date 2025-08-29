@@ -1,2 +1,2 @@
+pub mod forms;
 pub mod formvault;
-pub mod form;
