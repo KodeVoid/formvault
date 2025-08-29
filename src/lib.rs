@@ -20,7 +20,7 @@ pub async fn run() -> Result<SocketAddr, std::io::Error> {
         .connect(&database_url)
         .await
         .unwrap();
-    let listener = TcpListener::bind("localhost:0").unwrap();
+    let listener = TcpListener::bind("localhost:8080").unwrap();
     let port_addr = listener.local_addr().unwrap();
 
     let formvault = FormVault::new(database_pool, listener);
