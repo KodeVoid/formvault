@@ -1,7 +1,7 @@
+use crate::repositories::form::update_submission_status;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use crate::repositories::form::update_submission_status;
 
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct FormSubmission {
@@ -34,7 +34,12 @@ pub struct SubmissionMetadata {
 }
 
 impl FormSubmission {
-    pub fn new(form_schema_id: Uuid, encrypted_data: String, encrypted_key: String, metadata: SubmissionMetadata) -> Self {
+    pub fn new(
+        form_schema_id: Uuid,
+        encrypted_data: String,
+        encrypted_key: String,
+        metadata: SubmissionMetadata,
+    ) -> Self {
         Self {
             id: Uuid::new_v4(),
             form_schema_id,
@@ -53,7 +58,10 @@ impl FormSubmission {
         update_submission_status(self).await
     }
 
-    pub async fn mark_failed(&mut self, reason: String) -> Result<(), crate::errors::FormVaultError> {
+    pub async fn mark_failed(
+        &mut self,
+        reason: String,
+    ) -> Result<(), crate::errors::FormVaultError> {
         self.status = SubmissionStatus::Failed;
         self.failure_reason = Some(reason);
         update_submission_status(self).await

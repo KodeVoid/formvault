@@ -1,7 +1,9 @@
 use crate::routes;
-use actix_web::{App, HttpServer};
+use actix_web::{App, HttpServer, dev::Server, middleware::Logger};
+use log::info;
 use sqlx::PgPool;
 use std::net::TcpListener;
+
 pub struct FormVault {
     database_pool: PgPool,
     listener: TcpListener,
@@ -15,16 +17,23 @@ impl FormVault {
         }
     }
 
-    pub async fn start(self) -> std::io::Result<()> {
+    pub async fn start(self) -> std::io::Result<Server> {
         let pool = self.database_pool.clone();
+        let addr = self.listener.local_addr().unwrap();
 
-        HttpServer::new(move || {
+        info!("Starting HTTP server on {}", addr);
+
+        let server = HttpServer::new(move || {
             App::new()
+                // enable Actix built-in request logging
+                .wrap(Logger::default())
+                // make DB pool available to handlers
                 .app_data(pool.clone())
+                // configure routes
                 .configure(routes::configuration::health_check)
         })
         .listen(self.listener)?
-        .run()
-        .await
+        .run();
+        Ok(server)
     }
 }

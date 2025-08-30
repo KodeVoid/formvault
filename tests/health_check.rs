@@ -1,28 +1,26 @@
-// use formvault::server::{connect_db, run};
-// use std::net::TcpListener;
+use env_logger::Env;
+use formvault;
+use log::info;
+use std::net::SocketAddr;
 
-// async fn spawn_app() -> String {
-//     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
-//     let port = listener.local_addr().unwrap().port();
-//     let address = format!("http://127.0.0.1:{port}");
+async fn spawn_app() -> SocketAddr {
+    let _ = env_logger::Builder::from_env(Env::default().default_filter_or("info"))
+        .is_test(true)
+        .try_init();
 
-//     let db = connect_db().await;
-//     let server = run(listener, db).expect("Failed to start server");
-//     tokio::spawn(server); // runs in background
+    let (addr, server) = formvault::run().await.expect("Failed to start app");
+    tokio::spawn(server);
+    addr
+}
 
-//     address
-// }
+#[tokio::test] // instead of #[test]
+async fn test_health_check_point_works() {
+    let addr = spawn_app().await;
 
-// #[tokio::test]
-// async fn health_check() {
-//     let address = spawn_app().await; // ✅ fixed here
-//     let client = reqwest::Client::new();
+    let url = format!("http://{}/health_check", addr);
+    let response = reqwest::get(&url).await.expect("Failed to send request");
 
-//     let response = client
-//         .get(format!("{address}/health_check"))
-//         .send()
-//         .await
-//         .expect("Failed to execute request");
+    info!("Response: {:?}", response);
 
-//     assert!(response.status().is_success());
-// }
+    assert!(response.status().is_success());
+}

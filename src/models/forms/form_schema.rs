@@ -2,9 +2,9 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use super::{SubmissionMetadata, FormSubmission};
+use super::{FormSubmission, SubmissionMetadata};
 use crate::errors::FormVaultError;
-use crate::repositories::{encryption::encrypt_form_data, form::{save_submission, update_submission_status}};
+use crate::repositories::{encryption::encrypt_form_data, form::save_submission};
 use crate::webhook::send_webhook;
 
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
