@@ -5,11 +5,8 @@ mod repositories;
 mod routes;
 mod webhook;
 use std::net::SocketAddr;
-
 use std::net::TcpListener;
-
 use models::formvault::FormVault;
-
 use sqlx::postgres::PgPoolOptions;
 use std::env;
 
@@ -20,12 +17,16 @@ pub async fn run() -> Result<SocketAddr, std::io::Error> {
         .connect(&database_url)
         .await
         .unwrap();
-    let listener = TcpListener::bind("localhost:8080").unwrap();
+    
+    // Fix: Use PORT environment variable and bind to 0.0.0.0
+    let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string());
+    let bind_addr = format!("0.0.0.0:{}", port);
+    
+    let listener = TcpListener::bind(&bind_addr).unwrap();
     let port_addr = listener.local_addr().unwrap();
-
     let formvault = FormVault::new(database_pool, listener);
-    println!("Server Running on localhost:{:?}", port_addr);
-
+    
+    println!("Server Running on {}", bind_addr);
     formvault.start().await?;
     Ok(port_addr)
 }
