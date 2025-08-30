@@ -28,7 +28,7 @@ CREATE TYPE form_field_type AS ENUM (
 -- ========================
 
 -- forms table (FormSchema)
-CREATE TABLE forms (
+CREATE TABLE form_schemas (
     id UUID PRIMARY KEY,
     name TEXT NOT NULL,
     developer_id UUID NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE forms (
 -- field_definitions table (FieldDefinition)
 CREATE TABLE field_definitions (
     id UUID PRIMARY KEY,
-    form_id UUID NOT NULL REFERENCES forms(id) ON DELETE CASCADE,
+    form_id UUID NOT NULL REFERENCES form_schemas(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     field_type form_field_type NOT NULL,
     required BOOLEAN NOT NULL DEFAULT false,
@@ -50,9 +50,9 @@ CREATE TABLE field_definitions (
 );
 
 -- submissions table (FormSubmission)
-CREATE TABLE submissions (
+CREATE TABLE form_submissions (
     id UUID PRIMARY KEY,
-    form_schema_id UUID NOT NULL REFERENCES forms(id) ON DELETE CASCADE,
+    form_schema_id UUID NOT NULL REFERENCES form_schemas(id) ON DELETE CASCADE,
     encrypted_data TEXT NOT NULL,
     encrypted_key TEXT NOT NULL,
     metadata JSONB NOT NULL,

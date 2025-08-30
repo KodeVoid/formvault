@@ -1,7 +1,7 @@
 mod errors;
 mod handlers;
 mod models;
-mod repositories;
+pub mod repositories;
 mod routes;
 mod webhook;
 
