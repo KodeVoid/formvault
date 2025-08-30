@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE developers \n            SET name = $1, email = $2, public_key = $3\n            WHERE id = $4\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "1c2ee7e4ae71b0e278872bd184122927ceb8c4bc344aff9a80e0616e7fb55045"
+}
