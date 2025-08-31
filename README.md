@@ -48,3 +48,6 @@ We welcome contributions! To get started:
 ## Security & Privacy
 
 FormVault is designed with **end-to-end privacy in mind**. Submissions are encrypted on the client side before reaching the backend. Even FormVault cannot read your users’ data without the encryption key.
+
+### You can also contribute by filling out this survey form 
+### https://docs.google.com/forms/d/e/1FAIpQLSdSu7_cdfzU7Pye1VclW3jBOWC1QfwU3ZC6HYx0ifFYyQhOGg/viewform
