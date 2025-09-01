@@ -11,7 +11,7 @@
     <div id="app">
       <!-- Navbar -->
       <header class="bg-purple-700 text-white">
-        <nav class="container mx-auto px-6 py-4">
+        <nav class="container mx-auto px-6 py-4" aria-label="Main navigation">
           <ul class="flex space-x-6">
             <li v-for="link in navLinks" :key="link.id">
               <a :href="link.link" class="hover:underline font-semibold">
@@ -25,16 +25,17 @@
       <!-- Main -->
       <main class="container mx-auto px-6 py-12 text-center">
         <h1 class="text-4xl font-bold text-purple-700 mb-4">{{ pageTitle }}</h1>
-        <p class="text-lg">{{ intro }}</p>
-        <h2>
-          Contributions are Welcome
-          <a
-            href="http://github.com/kodevoid/formvault"
-            target="_blank"
-            rel="noopener noreferrer"
-            >FormVault Github's repo</a
-          >
-        </h2>
+        <p class="text-lg mb-8">{{ intro }}</p>
+
+        <h2 class="text-2xl font-semibold mb-4">Contributions are Welcome</h2>
+        <a
+          href="http://github.com/kodevoid/formvault"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-block bg-purple-700 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-800 transition"
+        >
+          Visit FormVault on GitHub
+        </a>
       </main>
     </div>
 
