@@ -6,58 +6,141 @@
     <title>FormVault</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      [v-cloak] {
+        display: none;
+      }
+    </style>
   </head>
   <body class="bg-white text-gray-800">
-    <div id="app">
-      <!-- Navbar -->
-      <header class="bg-purple-700 text-white">
-        <nav class="container mx-auto px-6 py-4" aria-label="Main navigation">
-          <ul class="flex space-x-6">
-            <li v-for="link in navLinks" :key="link.id">
-              <a :href="link.link" class="hover:underline font-semibold">
-                {{ link.name }}
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </header>
+    <div id="app" v-cloak>
+      <div class="min-h-screen" :class="{ 'bg-black text-white': darkModeOn }">
+        <!-- Navbar -->
+        <header class="bg-purple-700 text-white">
+          <nav
+            class="container mx-auto px-6 py-4 flex justify-between items-center"
+          >
+            <ul class="flex space-x-6">
+              <li v-for="link in navLinks" :key="link.id">
+                <button
+                  type="button"
+                  @click="switchPage(link.id)"
+                  class="hover:underline font-semibold px-2 py-1"
+                  :class="{ 'border-b-2 border-white': activePageId === link.id }"
+                  :aria-current="activePageId === link.id ? 'page' : null"
+                >
+                  {{ link.name }}
+                </button>
+              </li>
+            </ul>
+            <!-- Dark mode toggle -->
+            <button
+              type="button"
+              @click="toggleDarkMode"
+              class="bg-white text-purple-700 px-3 py-1 rounded font-semibold hover:bg-gray-200 transition"
+            >
+              {{ darkModeOn ? 'Light Mode' : 'Dark Mode' }}
+            </button>
+          </nav>
+        </header>
 
-      <!-- Main -->
-      <main class="container mx-auto px-6 py-12 text-center">
-        <h1 class="text-4xl font-bold text-purple-700 mb-4">{{ pageTitle }}</h1>
-        <p class="text-lg mb-8">{{ intro }}</p>
+        <!-- Main -->
+        <main class="container mx-auto px-6 py-12 text-center">
+          <h1 class="text-4xl font-bold text-purple-700 mb-4">
+            {{ currentPage.pageTitle }}
+          </h1>
+          <p class="text-lg mb-8">{{ currentPage.intro }}</p>
 
-        <h2 class="text-2xl font-semibold mb-4">Contributions are Welcome</h2>
-        <a
-          href="http://github.com/kodevoid/formvault"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-block bg-purple-700 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-800 transition"
-        >
-          Visit FormVault on GitHub
-        </a>
-      </main>
+          <h2 class="text-2xl font-semibold mb-4">Contributions are Welcome</h2>
+          <a
+            href="https://github.com/kodevoid/formvault"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-block bg-purple-700 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-800 transition"
+          >
+            Visit FormVault on GitHub
+          </a>
+        </main>
+      </div>
     </div>
-
     <script>
       Vue.createApp({
         data() {
           return {
-            navLinks: [
-              { id: "home", name: "Home", link: "#home" },
-              { id: "about", name: "About Us", link: "#about" },
-              { id: "services", name: "Services", link: "#services" },
-              {
-                id: "contribution",
-                name: "Contribution",
-                link: "#contribution",
-              },
-              { id: "waitlist", name: "WaitList", link: "#waitlist" },
+            // Centralized nav
+            allNavLinks: [
+              { id: "home", name: "Home" },
+              { id: "about", name: "About Us" },
+              { id: "services", name: "Services" },
+              { id: "contribution", name: "Contribution" },
+              { id: "waitlist", name: "WaitList" },
             ],
-            pageTitle: "FormVault",
-            intro:
-              "Welcome to FormVault, a safe and secure form handling service",
+
+            // Page definitions
+            pages: {
+              home: {
+                pageTitle: "FormVault",
+                intro:
+                  "Welcome to FormVault, a safe and secure form handling service",
+              },
+              about: {
+                pageTitle: "About FormVault",
+                intro:
+                  "We provide secure form handling and encryption services.",
+              },
+              services: {
+                pageTitle: "Our Services",
+                intro: "Explore the services FormVault offers to developers.",
+              },
+              waitlist: {
+                pageTitle: "Waitlist",
+                intro:
+                  "Join the waitlist and be the first to know when we launch.",
+              },
+            },
+
+            activePageId: "home",
+            darkModeOn: false,
           };
+        },
+
+        computed: {
+          currentPage() {
+            return (
+              this.pages[this.activePageId] || {
+                pageTitle: "Page not found",
+                intro: "The page you requested does not exist.",
+              }
+            );
+          },
+          navLinks() {
+            return this.allNavLinks.filter((l) => l.id !== this.activePageId);
+          },
+        },
+
+        methods: {
+          switchPage(id) {
+            if (!this.pages[id]) return;
+            this.activePageId = id;
+            location.hash = id;
+          },
+          toggleDarkMode() {
+            this.darkModeOn = !this.darkModeOn;
+            localStorage.setItem("darkModeOn", this.darkModeOn);
+          },
+        },
+
+        mounted() {
+          const savedDark = localStorage.getItem("darkModeOn");
+          if (savedDark !== null) this.darkModeOn = JSON.parse(savedDark);
+
+          const fromHash = location.hash.replace(/^#/, "");
+          if (fromHash && this.pages[fromHash]) this.activePageId = fromHash;
+
+          window.addEventListener("hashchange", () => {
+            const id = location.hash.replace(/^#/, "");
+            if (this.pages[id]) this.activePageId = id;
+          });
         },
       }).mount("#app");
     </script>
