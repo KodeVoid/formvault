@@ -11,10 +11,8 @@ use models::formvault::FormVault;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
 use std::net::{SocketAddr, TcpListener};
-
 pub async fn run() -> Result<(SocketAddr, Server), std::io::Error> {
     info!("Getting DATABASE_URL...");
-
     let database_url = match env::var("DATABASE_URL") {
         Ok(string) => {
             info!("DATABASE_URL found");
@@ -28,7 +26,6 @@ pub async fn run() -> Result<(SocketAddr, Server), std::io::Error> {
             ));
         }
     };
-
     let database_pool = match PgPoolOptions::new()
         .max_connections(5)
         .connect(&database_url)
@@ -46,10 +43,8 @@ pub async fn run() -> Result<(SocketAddr, Server), std::io::Error> {
             ));
         }
     };
-
     let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string());
     let bind_addr = format!("0.0.0.0:{}", port);
-
     let listener = match TcpListener::bind(&bind_addr) {
         Ok(listener) => listener,
         Err(e) => {
@@ -60,12 +55,9 @@ pub async fn run() -> Result<(SocketAddr, Server), std::io::Error> {
             ));
         }
     };
-
     let port_addr = listener.local_addr()?;
-
     let formvault = FormVault::new(database_pool, listener);
-
     info!("Server running on {}", bind_addr);
-    let server = formvault.start().await?;
+    let server = formvault.start()?; // Add the ? here
     Ok((port_addr, server))
 }

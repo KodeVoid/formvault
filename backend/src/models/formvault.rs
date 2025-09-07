@@ -8,21 +8,18 @@ pub struct FormVault {
     database_pool: PgPool,
     listener: TcpListener,
 }
-
-impl FormVault {
+				impl FormVault {
     pub fn new(pool: PgPool, listener: TcpListener) -> Self {
         Self {
             database_pool: pool,
             listener,
         }
     }
-
-    pub async fn start(self) -> std::io::Result<Server> {
+    
+    pub fn start(self) -> std::io::Result<Server> { // Remove async here
         let pool = self.database_pool.clone();
         let addr = self.listener.local_addr().unwrap();
-
         info!("Starting HTTP server on {}", addr);
-
         let server = HttpServer::new(move || {
             App::new()
                 // enable Actix built-in request logging
