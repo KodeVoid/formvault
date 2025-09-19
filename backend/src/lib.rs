@@ -1,17 +1,24 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+
 mod errors;
 mod handlers;
 mod models;
 pub mod repositories;
 mod routes;
 mod webhook;
+pub mod test_helpers;
 
 use actix_web::dev::Server;
 use log::{error, info};
 use models::formvault::FormVault;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
+use dotenv::dotenv;
 use std::net::{SocketAddr, TcpListener};
 pub async fn run() -> Result<(SocketAddr, Server), std::io::Error> {
+    dotenv().ok();
     info!("Getting DATABASE_URL...");
     let database_url = match env::var("DATABASE_URL") {
         Ok(string) => {

@@ -6,3 +6,9 @@ pub async fn health_check() -> impl Responder {
 
     HttpResponse::Ok().json(utc)
 }
+
+
+pub async fn get_api_routes()->impl Responder{
+    HttpResponse::Ok().json("[]")
+
+}

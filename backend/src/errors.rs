@@ -1,5 +1,4 @@
 use std::fmt;
-use reqwest::*;
 use serde::{Deserialize, Serialize};
 
 // Single unified error type for the entire application
@@ -127,9 +126,8 @@ impl From<sqlx::Error> for FormVaultError {
     }
 }
 
-// Convert from reqwest::Error (for webhook calls)
-impl From<reqwest::Error> for FormVaultError {
-    fn from(err: reqwest::Error) -> Self {
+impl From<std::io::Error> for FormVaultError {
+    fn from(err: std::io::Error) -> Self {
         FormVaultError::NetworkError(err.to_string())
     }
 }
