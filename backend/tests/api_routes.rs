@@ -17,7 +17,10 @@ async fn test_get_api_routes() {
         .expect("Failed to connect to server");
 
     // Check that response is 200 OK
-    assert!(response.status().is_success(), "Response was not successful");
+    assert!(
+        response.status().is_success(),
+        "Response was not successful"
+    );
 
     // Optionally, check the JSON structure
     let body: serde_json::Value = response

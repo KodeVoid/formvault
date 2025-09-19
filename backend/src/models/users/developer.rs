@@ -1,10 +1,9 @@
+use crate::errors::{FormVaultError, FormVaultResult};
+use crate::models::forms::form_schema::FormSchema;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, Row};
-use crate::errors::*;
 use uuid::Uuid;
-use chrono::{DateTime, Utc};
-use crate::models::forms::form_schema::FormSchema;
-use crate::errors::{FormVaultError,FormVaultResult};
 
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Developer {
@@ -16,7 +15,6 @@ pub struct Developer {
     api_key: String,
     is_active: bool,
 }
-
 
 impl Developer {
     /// Create a new developer
@@ -119,7 +117,7 @@ impl Developer {
     /// Regenerate API key (in case of compromise)
     pub async fn regenerate_api_key(&mut self, pool: &PgPool) -> FormVaultResult<String> {
         let new_api_key = Self::generate_api_key();
-        
+
         sqlx::query!(
             "UPDATE developers SET api_key = $1 WHERE id = $2",
             new_api_key,
@@ -135,7 +133,7 @@ impl Developer {
     /// Deactivate developer account
     pub async fn deactivate(&mut self, pool: &PgPool) -> FormVaultResult<()> {
         self.is_active = false;
-        
+
         sqlx::query!(
             "UPDATE developers SET is_active = false WHERE id = $1",
             self.id
@@ -191,14 +189,18 @@ impl Developer {
     }
 
     /// Update public key (when developer rotates keys)
-    pub async fn update_public_key(&mut self, new_public_key: String, pool: &PgPool) -> FormVaultResult<()> {
+    pub async fn update_public_key(
+        &mut self,
+        new_public_key: String,
+        pool: &PgPool,
+    ) -> FormVaultResult<()> {
         // TODO: Validate the public key format
         if !Self::is_valid_public_key(&new_public_key) {
             return Err(FormVaultError::InvalidPublicKey);
         }
 
         self.public_key = new_public_key;
-        
+
         sqlx::query!(
             "UPDATE developers SET public_key = $1 WHERE id = $2",
             self.public_key,
@@ -217,21 +219,20 @@ impl Developer {
     }
 
     /// Check if email is already taken
- pub async fn email_exists(email: &str, pool: &PgPool) -> FormVaultResult<bool> {
-    let record = sqlx::query!(
-        "SELECT COUNT(*) as count FROM developers WHERE email = $1",
-        email
-    )
-    .fetch_one(pool)
-    .await?;
+    pub async fn email_exists(email: &str, pool: &PgPool) -> FormVaultResult<bool> {
+        let record = sqlx::query!(
+            "SELECT COUNT(*) as count FROM developers WHERE email = $1",
+            email
+        )
+        .fetch_one(pool)
+        .await?;
 
-    if let Some(count) = record.count {
-        Ok(count > 0)
-    } else {
-        Ok(false)
+        if let Some(count) = record.count {
+            Ok(count > 0)
+        } else {
+            Ok(false)
+        }
     }
-}
-
 
     /// Create developer with email uniqueness check
     pub async fn create_unique(
@@ -252,7 +253,7 @@ impl Developer {
 
         let developer = Self::new(name, email, public_key);
         developer.save(pool).await?;
-        
+
         Ok(developer)
     }
 

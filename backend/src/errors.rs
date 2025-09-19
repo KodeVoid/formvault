@@ -1,51 +1,49 @@
+use serde::Serialize;
 use std::fmt;
-use serde::{Deserialize, Serialize};
 
 // Single unified error type for the entire application
 #[derive(Debug)]
 pub enum FormVaultError {
     // Database errors
     DatabaseError(sqlx::Error),
-    
+
     // Resource errors
     NotFound,
     DeveloperNotFound,
     FormNotFound,
     SubmissionNotFound,
-    
+
     // Authentication/Authorization
     Unauthorized,
     InvalidApiKey,
-    
+
     // Validation errors
     ValidationFailed(Vec<String>),
     ValidationError(String),
     InvalidEmail,
     InvalidPublicKey,
     DuplicateEmail,
-    
+
     // Encryption errors
     EncryptionError(String),
     DecryptionError(String),
-    
+
     // Webhook errors
     WebhookFailed(String),
     WebhookTimeout,
-    
+
     // Network errors
     NetworkError(String),
-    
+
     // Business logic errors
     FormLimitExceeded,
     SubmissionLimitExceeded,
     InactiveAccount,
-
 }
 
 impl fmt::Display for FormVaultError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self
-         {
+        match self {
             FormVaultError::DatabaseError(e) => {
                 write!(f, "Database error: {}", e)
             }
@@ -103,8 +101,8 @@ impl fmt::Display for FormVaultError {
             FormVaultError::InactiveAccount => {
                 write!(f, "Account is inactive or suspended")
             }
-            FormVaultError::ValidationError(e)=>{
-                write!(f,"Validation Failed {}",e)
+            FormVaultError::ValidationError(e) => {
+                write!(f, "Validation Failed {}", e)
             }
         }
     }
@@ -147,35 +145,29 @@ impl FormVaultError {
     /// Convert error to HTTP response format
     pub fn to_response(&self) -> ErrorResponse {
         match self {
-            FormVaultError::NotFound | FormVaultError::DeveloperNotFound 
-            | FormVaultError::FormNotFound | FormVaultError::SubmissionNotFound => {
-                ErrorResponse {
-                    error: self.to_string(),
-                    code: "NOT_FOUND".to_string(),
-                    details: None,
-                }
-            }
-            FormVaultError::Unauthorized | FormVaultError::InvalidApiKey => {
-                ErrorResponse {
-                    error: "Access denied".to_string(),
-                    code: "UNAUTHORIZED".to_string(),
-                    details: None,
-                }
-            }
-            FormVaultError::ValidationFailed(errors) => {
-                ErrorResponse {
-                    error: "Validation failed".to_string(),
-                    code: "VALIDATION_ERROR".to_string(),
-                    details: Some(errors.clone()),
-                }
-            }
-            FormVaultError::DuplicateEmail => {
-                ErrorResponse {
-                    error: self.to_string(),
-                    code: "DUPLICATE_EMAIL".to_string(),
-                    details: None,
-                }
-            }
+            FormVaultError::NotFound
+            | FormVaultError::DeveloperNotFound
+            | FormVaultError::FormNotFound
+            | FormVaultError::SubmissionNotFound => ErrorResponse {
+                error: self.to_string(),
+                code: "NOT_FOUND".to_string(),
+                details: None,
+            },
+            FormVaultError::Unauthorized | FormVaultError::InvalidApiKey => ErrorResponse {
+                error: "Access denied".to_string(),
+                code: "UNAUTHORIZED".to_string(),
+                details: None,
+            },
+            FormVaultError::ValidationFailed(errors) => ErrorResponse {
+                error: "Validation failed".to_string(),
+                code: "VALIDATION_ERROR".to_string(),
+                details: Some(errors.clone()),
+            },
+            FormVaultError::DuplicateEmail => ErrorResponse {
+                error: self.to_string(),
+                code: "DUPLICATE_EMAIL".to_string(),
+                details: None,
+            },
             FormVaultError::FormLimitExceeded | FormVaultError::SubmissionLimitExceeded => {
                 ErrorResponse {
                     error: self.to_string(),
@@ -183,31 +175,33 @@ impl FormVaultError {
                     details: None,
                 }
             }
-            _ => {
-                ErrorResponse {
-                    error: "Internal server error".to_string(),
-                    code: "INTERNAL_ERROR".to_string(),
-                    details: None,
-                }
-            }
+            _ => ErrorResponse {
+                error: "Internal server error".to_string(),
+                code: "INTERNAL_ERROR".to_string(),
+                details: None,
+            },
         }
     }
 
     /// Get HTTP status code for this error
     pub fn status_code(&self) -> u16 {
         match self {
-            FormVaultError::NotFound | FormVaultError::DeveloperNotFound 
-            | FormVaultError::FormNotFound | FormVaultError::SubmissionNotFound => 404,
-            
+            FormVaultError::NotFound
+            | FormVaultError::DeveloperNotFound
+            | FormVaultError::FormNotFound
+            | FormVaultError::SubmissionNotFound => 404,
+
             FormVaultError::Unauthorized | FormVaultError::InvalidApiKey => 401,
-            
-            FormVaultError::ValidationFailed(_) | FormVaultError::InvalidEmail 
-            | FormVaultError::InvalidPublicKey | FormVaultError::DuplicateEmail => 400,
-            
+
+            FormVaultError::ValidationFailed(_)
+            | FormVaultError::InvalidEmail
+            | FormVaultError::InvalidPublicKey
+            | FormVaultError::DuplicateEmail => 400,
+
             FormVaultError::FormLimitExceeded | FormVaultError::SubmissionLimitExceeded => 429,
-            
+
             FormVaultError::InactiveAccount => 403,
-            
+
             _ => 500,
         }
     }

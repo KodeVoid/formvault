@@ -4,7 +4,7 @@ use log::info;
 use std::net::SocketAddr;
 
 use formvault::test_helpers::spawn_app;
-#[tokio::test] 
+#[tokio::test]
 async fn test_health_check_point_works() {
     let addr = spawn_app().await;
 
