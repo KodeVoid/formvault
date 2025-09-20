@@ -20,19 +20,23 @@ pub async fn health_check() -> impl Responder {
 struct ApiRoute {
     method: &'static str,
     url: String,
+    description: Option<&'static str>,
 }
 
 pub async fn get_api_routes(req: HttpRequest) -> impl Responder {
-    let host = req.connection_info().host(); '
+    let scheme = req.connection_info().scheme();
+    let host = req.connection_info().host();
 
     let routes = vec![
         ApiRoute { 
             method: "GET", 
-            url: format!("http://{}/health_check", host),
+            url: format!("{}://{}/health_check", scheme, host),
+            description: Some("Health check endpoint"),
         },
         ApiRoute { 
             method: "GET", 
-            url: format!("http://{}/", host),
+            url: format!("{}://{}/", scheme, host),
+            description: Some("API root"),
         },
     ];
 
