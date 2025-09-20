@@ -24,8 +24,8 @@ struct ApiRoute {
 }
 
 pub async fn get_api_routes(req: HttpRequest) -> impl Responder {
-    let scheme = req.connection_info().scheme();
-    let host = req.connection_info().host();
+    let scheme = req.connection_info().scheme().to_string();
+    let host = req.connection_info().host().to_string();
 
     let routes = vec![
         ApiRoute { 
@@ -42,3 +42,4 @@ pub async fn get_api_routes(req: HttpRequest) -> impl Responder {
 
     HttpResponse::Ok().json(routes)
 }
+
