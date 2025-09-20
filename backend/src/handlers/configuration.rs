@@ -1,4 +1,4 @@
-use actix_web::{HttpResponse, Responder};
+use actix_web::{HttpRequest, HttpResponse, Responder};
 use chrono::prelude::*;
 use serde::Serialize;
 
@@ -19,13 +19,22 @@ pub async fn health_check() -> impl Responder {
 #[derive(Serialize)]
 struct ApiRoute {
     method: &'static str,
-    path: &'static str,
+    url: String,
 }
 
-pub async fn get_api_routes() -> impl Responder {
+pub async fn get_api_routes(req: HttpRequest) -> impl Responder {
+]    let host = req.connection_info().host(); 
+
     let routes = vec![
-        ApiRoute { method: "GET", path: "/health" },
-        ApiRoute { method: "GET", path: "/api/routes" },
+        ApiRoute { 
+            method: "GET", 
+            url: format!("http://{}/health_check", host),
+        },
+        ApiRoute { 
+            method: "GET", 
+            url: format!("http://{}/", host),
+        },
     ];
+
     HttpResponse::Ok().json(routes)
 }
