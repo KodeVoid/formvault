@@ -23,7 +23,7 @@ struct ApiRoute {
 }
 
 pub async fn get_api_routes(req: HttpRequest) -> impl Responder {
-]    let host = req.connection_info().host(); 
+    let host = req.connection_info().host(); '
 
     let routes = vec![
         ApiRoute { 
