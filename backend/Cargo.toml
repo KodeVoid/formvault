@@ -5,6 +5,11 @@ edition = "2024"
 license = "MIT"
 repository = "https://github.com/kodevoid/formvault"
 homepage = "https://formvault.vercel.app"
+description = "FormVault is a secure and fast form backend built with Rust and PostgreSQL."
+readme = "README.md"
+keywords = ["forms", "backend", "postgres", "actix-web", "api"]
+categories = ["web-programming::http-servers", "database"]
+
 
 [lib]
 name = "formvault"
