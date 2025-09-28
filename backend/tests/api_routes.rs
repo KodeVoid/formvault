@@ -1,5 +1,5 @@
 // api_routes.rs
-use formvault::test_helpers::spawn_app;
+use formvault::spawn_app;
 use reqwest;
 use tokio;
 

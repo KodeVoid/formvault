@@ -28,13 +28,13 @@ pub async fn get_api_routes(req: HttpRequest) -> impl Responder {
     let host = req.connection_info().host().to_string();
 
     let routes = vec![
-        ApiRoute { 
-            method: "GET", 
+        ApiRoute {
+            method: "GET",
             url: format!("{}://{}/health_check", scheme, host),
             description: Some("Health check endpoint"),
         },
-        ApiRoute { 
-            method: "GET", 
+        ApiRoute {
+            method: "GET",
             url: format!("{}://{}/", scheme, host),
             description: Some("API root"),
         },
@@ -42,4 +42,3 @@ pub async fn get_api_routes(req: HttpRequest) -> impl Responder {
 
     HttpResponse::Ok().json(routes)
 }
-

@@ -28,7 +28,8 @@ impl FormVault {
                 // make DB pool available to handlers
                 .app_data(pool.clone())
                 // configure routes
-                .configure(routes::configuration::health_check).configure(routes::configuration::api_routes)
+                .configure(routes::configuration::health_check)
+                .configure(routes::configuration::api_routes)
         })
         .listen(self.listener)?
         .run();

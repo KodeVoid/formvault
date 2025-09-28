@@ -2,6 +2,12 @@
 name = "formvault"
 version = "0.1.0"
 edition = "2024"
+description=""
+license="MIT"
+repository="https://github.com/kodevoid/formvault"
+homepage="https://formvault.vercel.app"
+documentation=""
+
 
 [lib]
 name = "formvault"
@@ -24,3 +30,7 @@ env_logger = "0.11.8"
 dotenv = "0.15.0"
 [dev-dependencies]
 reqwest = { version = "0.12.22", default-features = false, features = ["rustls-tls","json"] }
+criterion = { version = "0.5", features = ["html_reports", "async_tokio"] }
+[[bench]]
+name = "formvault_bench"
+harness = false
