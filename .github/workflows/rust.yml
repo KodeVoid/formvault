@@ -15,13 +15,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Cd
-      run: cd backend
     - uses: actions/checkout@v4
     - name: Build
       run: cargo build --verbose
+      working-directory: backend
     - name: Fmt
       run: cargo fmt
+      working-directory: backend
+
     - name: Run tests
       run: cargo test --verbose
-  
+      working-directory: backend
+
