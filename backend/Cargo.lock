@@ -410,6 +410,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "cargo-husky"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b02b629252fe8ef6460461409564e2c21d0c8e77e0944f3d189ff06c4e932ad"
+
+[[package]]
 name = "cast"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -862,6 +868,7 @@ name = "formvault"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "cargo-husky",
  "chrono",
  "criterion",
  "dotenv",

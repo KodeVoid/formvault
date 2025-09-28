@@ -2,12 +2,9 @@
 name = "formvault"
 version = "0.1.0"
 edition = "2024"
-description=""
-license="MIT"
-repository="https://github.com/kodevoid/formvault"
-homepage="https://formvault.vercel.app"
-documentation=""
-
+license = "MIT"
+repository = "https://github.com/kodevoid/formvault"
+homepage = "https://formvault.vercel.app"
 
 [lib]
 name = "formvault"
@@ -28,9 +25,19 @@ sqlx = { version = "0.8.6", features = ["postgres", "uuid", "chrono", "runtime-t
 log = "0.4.27"
 env_logger = "0.11.8"
 dotenv = "0.15.0"
+
 [dev-dependencies]
-reqwest = { version = "0.12.22", default-features = false, features = ["rustls-tls","json"] }
+reqwest = { version = "0.12.22", default-features = false, features = ["rustls-tls", "json"] }
 criterion = { version = "0.5", features = ["html_reports", "async_tokio"] }
+cargo-husky = "1"
+
 [[bench]]
 name = "formvault_bench"
 harness = false
+
+[package.metadata.husky]
+# Run formatting + lint checks before committing
+pre-commit = "cd backend && cargo fmt --all -- --check && cargo clippy -- -D warnings"
+
+# Run tests before pushing
+pre-push = "cd backend && cargo test --all --quiet"
