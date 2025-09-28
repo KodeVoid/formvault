@@ -136,7 +136,11 @@ pub async fn run() -> Result<(SocketAddr, Server), std::io::Error> {
     // Initialize and start server
     let formvault = FormVault::new(database_pool, listener);
     let server = formvault.start()?;
-    info!("Server successfully started on {} (actual port: {})", bind_addr, port_addr.port());
+    info!(
+        "Server successfully started on {} (actual port: {})",
+        bind_addr,
+        port_addr.port()
+    );
 
     Ok((port_addr, server))
 }
