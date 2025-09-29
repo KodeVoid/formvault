@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "master" ]       # build & test on master
     tags:
-      - 'v*'                     # release only on tags like v0.1.0
+      - '*'                     # release only on tags like v0.1.0
   pull_request:
     branches: [ "master" ]
 
