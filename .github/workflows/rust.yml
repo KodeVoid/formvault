@@ -1,93 +1,121 @@
 name: FormVault
-
 on:
   push:
-    branches: [ "master" ]       # build & test on master
     tags:
-      - '*'                     # release only on tags like v0.1.0
-  pull_request:
-    branches: [ "master" ]
+      - '*'                     # trigger only on tags like v0.1.0
 
 env:
   CARGO_TERM_COLOR: always
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  CARGO_INCREMENTAL: 0          # Disable incremental compilation for faster CI
+  CARGO_NET_RETRY: 10
+  RUST_BACKTRACE: short
 
 jobs:
   build:
-    if: github.event_name != 'push' || startsWith(github.ref, 'refs/heads/master')
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: backend
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Cache all Rust artifacts (dependencies + target + cargo-release)
+      
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      
+      - name: Cache Cargo registry and git
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            ~/.cargo/bin
-            backend/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('backend/Cargo.lock') }}
-
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('backend/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+      
+      - name: Cache build artifacts
+        uses: actions/cache@v4
+        with:
+          path: backend/target/
+          key: ${{ runner.os }}-cargo-target-${{ hashFiles('backend/Cargo.lock') }}-${{ hashFiles('backend/**/*.rs') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-target-${{ hashFiles('backend/Cargo.lock') }}-
+            ${{ runner.os }}-cargo-target-
+      
       - name: Build
-        run: cargo build --verbose
-
+        run: cargo build --release --verbose
+      
       - name: Fmt
         run: cargo fmt --all -- --check
-
+      
       - name: Run tests
-        run: cargo test --verbose
-
+        run: cargo test --release --verbose
+      
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: backend-target
-          path: backend/target
+          path: |
+            backend/target/release/formvault
+            backend/target/release/deps/
+          retention-days: 1       # Delete artifacts after 1 day
 
   release:
-    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     needs: build
     defaults:
       run:
         working-directory: backend
-
     steps:
       - uses: actions/checkout@v4
-
+      
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Restore Cargo registry and git cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('backend/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+      
+      - name: Restore build artifacts cache
+        uses: actions/cache/restore@v4
+        with:
+          path: backend/target/
+          key: ${{ runner.os }}-cargo-target-${{ hashFiles('backend/Cargo.lock') }}-${{ hashFiles('backend/**/*.rs') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-target-${{ hashFiles('backend/Cargo.lock') }}-
+      
       - name: Restore build artifacts
         uses: actions/download-artifact@v4
         with:
           name: backend-target
           path: backend/target
-
-      - name: Restore cache (dependencies + target + cargo-release)
+      
+      - name: Cache cargo-release binary
+        id: cache-cargo-release
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            ~/.cargo/bin
-            backend/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('backend/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
-
+          path: ~/.cargo/bin/cargo-release
+          key: ${{ runner.os }}-cargo-release-${{ hashFiles('~/.cargo/bin/cargo-release') }}
+      
       - name: Install cargo-release if missing
-        run: |
-          if ! command -v cargo-release >/dev/null; then
-            cargo install --locked cargo-release
-          fi
-
+        if: steps.cache-cargo-release.outputs.cache-hit != 'true'
+        run: cargo install --locked cargo-release
+      
       - name: Run cargo release
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo release --execute --no-publish
-
+      
       - name: Publish to crates.io
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
