@@ -8,7 +8,7 @@ homepage = "https://formvault.vercel.app"
 description = "FormVault is a secure and fast form backend built with Rust and PostgreSQL."
 readme = "../README.md"
 keywords = ["forms", "backend", "postgres", "actix-web", "api"]
-categories = ["web-programming::http-servers", "database"]
+categories = ["development-tools", "database"]
 
 
 [lib]

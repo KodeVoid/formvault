@@ -20,12 +20,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache cargo registry + target
+      - name: Cache all Rust artifacts (dependencies + target + cargo-release)
         uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
+            ~/.cargo/bin
             backend/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('backend/Cargo.lock') }}
 
@@ -60,17 +61,23 @@ jobs:
           name: backend-target
           path: backend/target
 
-      - name: Cache cargo registry + target
+      - name: Restore cache (dependencies + target + cargo-release)
         uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
+            ~/.cargo/bin
             backend/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('backend/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
 
-      - name: Install cargo-release
-        run: cargo install --locked cargo-release
+      - name: Install cargo-release if missing
+        run: |
+          if ! command -v cargo-release >/dev/null; then
+            cargo install --locked cargo-release
+          fi
 
       - name: Run cargo release
         env:
